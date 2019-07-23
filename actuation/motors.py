@@ -15,16 +15,21 @@ GPIO.setmode(GPIO.BOARD)
 
 class HW95Motor:
     
-    def __init__(self, IN1, IN2, EN):
-        self.IN1 = IN1
-        self.IN2 = IN2
+    def __init__(self, IN1, IN2, EN, flip_dir=False):
+        if not flip_dir:
+            self.IN1 = IN1
+            self.IN2 = IN2
+        else:
+            self.IN1 = IN2
+            self.IN2 = IN1
+            
         self.EN = EN
         
         GPIO.setup(self.IN1, GPIO.OUT)
         GPIO.setup(self.IN2, GPIO.OUT)
         GPIO.setup(self.EN, GPIO.OUT)
         
-        self.en_pwm = GPIO.PWM(self.pin, 100) #100 Hz
+        self.en_pwm = GPIO.PWM(self.EN, 100) #100 Hz
         self.en_pwm.start(0) #Default to 0 duty cycle
         
     def setSpeed(self, speed_percentage):
@@ -106,10 +111,4 @@ class SmartWheel:
     def encoderCallback(self):
         self.measured_speed = self.encoder.getSpeed()
         self.updateMotorInput()
-        
-    
-#Test
-        
-if __name__ == "__main__":
-    
     

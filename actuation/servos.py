@@ -21,7 +21,7 @@ class Servo:
         self.servo_pwm = GPIO.PWM(self.PIN, 100)
         self.servo_pwm.start(self.angleToDutyCycle(self.angle))
         
-    def angleToDutyCycle(angle):
+    def angleToDutyCycle(self, angle):
         return (float(angle)/10.0) + 2.5
     
     def setAngle(self, angle):
