@@ -1,8 +1,7 @@
 import RPi.GPIO as GPIO
 import time
-import math
 
-from actuation.motors import HW95Motor, WheelEncoder 
+from actuation.motors import SmartMotor
 from actuation.servos import Servo 
 
 print("Setup")
@@ -13,9 +12,11 @@ GPIO.setmode(GPIO.BOARD)
 
 #Pins
 
+#Left motor
 HW95_IN1 = 11
 HW95_IN2 = 13
 HW95_ENA = 15
+#Right motor
 HW95_IN3 = 22
 HW95_IN4 = 24
 HW95_ENB = 26
@@ -26,42 +27,23 @@ ENCODER_RIGHT = 8
 SERVO_1 = 10
 SERVO_2 = 12
 
-#Motor Driver
+#Motors
 
-left_motor = HW95Motor(HW95_IN1, HW95_IN2, HW95_ENA, True)
-right_motor = HW95Motor(HW95_IN3, HW95_IN4, HW95_ENB, True)
-
-#Encoders
-
-left_encoder = WheelEncoder(7, 20, 3.5)
-right_encoder = WheelEncoder(8, 20, 3.5)
+left_motor = SmartMotor(HW95_IN1, HW95_IN2, HW95_ENA, ENCODER_LEFT, 20, 3, True)
+right_motor = SmartMotor(HW95_IN3, HW95_IN4, HW95_ENB, ENCODER_RIGHT, 20, 3, True)
         
 #Servos
 
-servo1 = Servo(SERVO_1)
-servo2 = Servo(SERVO_2)
-
-servo1.setAngle(0)
-servo2.setAngle(180)
-
-time.sleep(1)
-
-servo1.setAngle(180)
-servo2.setAngle(0)   
-
-time.sleep(1)
-
-servo1.setAngle(90)
-servo2.setAngle(90)
+#servo1 = Servo(SERVO_1)
+#servo2 = Servo(SERVO_2)
 
 print("Starting main loop")
 
-left_motor.setSpeed(50)
-right_motor.setSpeed(50)
+left_motor.setSpeed(15)
+right_motor.setSpeed(15)
 
-while left_encoder.getDistance()<5:
-    time.sleep(0.005) 
-
+time.sleep(2.5)
+    
 print("Ending program")
 
 left_motor.setSpeed(0)
