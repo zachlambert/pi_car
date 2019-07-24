@@ -2,7 +2,6 @@ import RPi.GPIO as GPIO
 import time
 
 from actuation.motors import SmartMotor
-from actuation.servos import Servo 
 
 print("Setup")
 
@@ -31,18 +30,18 @@ SERVO_2 = 12
 
 left_motor = SmartMotor(HW95_IN1, HW95_IN2, HW95_ENA, ENCODER_LEFT, 20, 3, True)
 right_motor = SmartMotor(HW95_IN3, HW95_IN4, HW95_ENB, ENCODER_RIGHT, 20, 3, True)
-        
-#Servos
-
-#servo1 = Servo(SERVO_1)
-#servo2 = Servo(SERVO_2)
 
 print("Starting main loop")
 
 left_motor.setSpeed(15)
 right_motor.setSpeed(15)
 
-time.sleep(2.5)
+end_time = time.time() + 3
+while time.time()<end_time:
+    left_motor.update()
+    right_motor.update()
+    time.sleep(0.01)
+
     
 print("Ending program")
 

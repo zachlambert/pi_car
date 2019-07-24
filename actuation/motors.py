@@ -58,16 +58,17 @@ class HW95Motor:
         
 class WheelEncoder:
     
-    def __init__(self, PIN, num_slots, wheel_radius, extraCallback=None):
+    def __init__(self, PIN, num_slots, wheel_radius):
         self.PIN = PIN
         self.num_changes = num_slots*2
         self.wheel_radius = wheel_radius
         self.pulse_count = 0
-        self.extraCallback = extraCallback
-        
+
         self.distance_step = self.wheel_radius * ((2*math.pi) / self.num_changes)
         self.speed = 0
         self.prev_time = time.time()
+        self.change_list = []
+        self.measure_window= 0.1
         
         GPIO.setup(self.PIN, GPIO.IN)
         
@@ -75,9 +76,32 @@ class WheelEncoder:
 
     def callback(self, channel):
         self.pulse_count += 1
-        if self.extraCallback!=None:
-            self.extraCallback()
+        current_time = time.time()
+        elapsed_time = current_time - self.prev_time
+        self.prev_time = current_time
+        
+        i = 0
+        while i < len(self.change_list):
+            self.change_list[i] += elapsed_time
+            if self.change_list[i] > self.measure_window:
+                self.change_list.pop(i)
+            else:
+                i+=1
             
+        self.change_list.append(0)
+        
+    def getSpeed(self):
+        current_time = time.time()
+        elapsed_time = current_time - self.prev_time
+        time_limit = self.measure_window - elapsed_time
+        
+        change_count = 0
+        for change in self.change_list:
+            if change <= time_limit:
+                change_count+=1
+                
+        return (change_count * self.distance_step) / self.measure_window
+    
     def reset(self):
         self.pulse_count = 0
 
@@ -89,37 +113,38 @@ class SmartMotor:
     
     def __init__(self, MOTOR_IN1, MOTOR_IN2, MOTOR_EN, ENCODER_PIN, num_slots, wheel_radius, flip_dir=False):
         self.motor = HW95Motor(MOTOR_IN1, MOTOR_IN2, MOTOR_EN, flip_dir)
-        self.encoder = WheelEncoder(ENCODER_PIN, num_slots, wheel_radius, self.encoderCallback)
+        self.encoder = WheelEncoder(ENCODER_PIN, num_slots, wheel_radius)
         
         self.direction = 0
         
-        self.prev_time = time.time()
         self.measured_speed = 0
-        self.callback_count = 0
-        self.callback_required = 2
+        self.prev_time = time.time()
         
         self.target_speed = 0
         self.error = 0
         self.motor_input = 0
         
-        self.kp = 1.2
-        self.ki = 0.1
-        self.kd = 0.1
+        self.kp = 0.16
+        self.ki = 0.005
+        self.kd = 0.03
         
         self.setSpeed(0)
-    
-    def updateMotorInput(self, elapsed_time):
-        print("Target: ", self.target_speed)
-        print("Measured: ", self.measured_speed)
-        prev_motor_input = self.motor_input
+
+    def update(self):
+
+        current_time = time.time()
+        elapsed_time = current_time - self.prev_time
+        self.prev_time = current_time
+        
+        self.measured_speed = self.encoder.getSpeed()
+        print(self.measured_speed)
         
         new_error = self.target_speed - self.measured_speed
         self.motor_input += self.kp * new_error
         self.motor_input += self.ki * ((new_error - self.error)*elapsed_time)
         self.motor_input += self.kd * ((new_error - self.error)/elapsed_time)
         self.error = new_error
-        
-        print("Output: ", prev_motor_input, " to ", self.motor_input)
+
         
         if self.motor_input > 100:
             self.motor_input = 100
@@ -128,8 +153,7 @@ class SmartMotor:
             self.motor_input = 0
         
         self.motor.setSpeed(self.motor_input*self.direction)
-        
-        print("----")
+
         
     def setSpeed(self, speed):
         if speed==0:
@@ -142,19 +166,4 @@ class SmartMotor:
         self.target_speed = abs(speed)
         self.motor_input = 100
         self.motor.setSpeed(self.motor_input*self.direction)
-        
-    def encoderCallback(self):
-        self.callback_count += 1
-        
-        if self.callback_count>=self.callback_required:
-            self.callback_count = 0
-            
-            current_time = time.time()
-            elapsed_time = current_time - self.prev_time
-            self.prev_time = current_time
-            
-            self.measured_speed = self.encoder.getDistance()/elapsed_time
-            self.encoder.reset()
-            
-            self.updateMotorInput(elapsed_time)
         
