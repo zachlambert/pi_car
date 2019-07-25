@@ -2,6 +2,7 @@ import RPi.GPIO as GPIO
 import time
 
 from actuation.motors import SmartMotor
+from actuation.servos import Servo
 
 print("Setup")
 

@@ -154,4 +154,3 @@ if __name__ == "__main__":
         print(compass.getHeading())
         
         time.sleep(0.25)
-        
