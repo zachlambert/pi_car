@@ -72,8 +72,9 @@ class WheelEncoder:
         
         GPIO.setup(self.PIN, GPIO.IN)
         
+        GPIO.remove_event_detect(self.PIN)
         GPIO.add_event_detect(self.PIN, GPIO.BOTH, self.callback)
-
+        
     def callback(self, channel):
         self.pulse_count += 1
         current_time = time.time()
@@ -129,7 +130,7 @@ class SmartMotor:
         self.kd = 0.03
         
         self.setSpeed(0)
-
+        
     def update(self):
 
         current_time = time.time()
@@ -137,14 +138,12 @@ class SmartMotor:
         self.prev_time = current_time
         
         self.measured_speed = self.encoder.getSpeed()
-        print(self.measured_speed)
         
         new_error = self.target_speed - self.measured_speed
         self.motor_input += self.kp * new_error
         self.motor_input += self.ki * ((new_error - self.error)*elapsed_time)
         self.motor_input += self.kd * ((new_error - self.error)/elapsed_time)
         self.error = new_error
-
         
         if self.motor_input > 100:
             self.motor_input = 100
@@ -167,3 +166,202 @@ class SmartMotor:
         self.motor_input = 100
         self.motor.setSpeed(self.motor_input*self.direction)
         
+        
+#Functions for testing
+
+def testMotors(HW95_IN1, HW95_IN2, HW95_ENA, HW95_IN3, HW95_IN4, HW95_ENB):
+    
+    left_motor = HW95Motor(HW95_IN1, HW95_IN2, HW95_ENA, True)
+    right_motor = HW95Motor(HW95_IN3, HW95_IN4, HW95_ENB, True)
+
+    #Test left motor
+    
+    print("Testing left motor")
+    
+    time.sleep(1)
+    
+    print("Left motor forward at 50%")
+    left_motor.setSpeed(50)
+    time.sleep(1)
+    
+    print("Left motor forward at 100%")
+    left_motor.setSpeed(100)
+    time.sleep(1)
+    
+
+    print("Left motor stopping")
+    left_motor.setSpeed(0)
+    time.sleep(1)
+    
+    print("Left motor backward at 50%")
+    left_motor.setSpeed(-50)
+    time.sleep(1)
+    
+    print("Left motor backward at 100%")
+    left_motor.setSpeed(-100)
+    time.sleep(1)
+    
+    left_motor.setSpeed(0)
+    
+    #Test right motor
+    
+    print("Testing right motor")
+    
+    time.sleep(1)
+    
+    print("Right motor forward at 50%")
+    right_motor.setSpeed(50)
+    time.sleep(1)
+    
+    print("Right motor forward at 100%")
+    right_motor.setSpeed(100)
+    time.sleep(1)
+    
+
+    print("Right motor stopping")
+    right_motor.setSpeed(0)
+    time.sleep(1)
+    
+    print("Right motor backward at 50%")
+    right_motor.setSpeed(-50)
+    time.sleep(1)
+    
+    print("Right motor backward at 100%")
+    right_motor.setSpeed(-100)
+    time.sleep(1)
+    
+    right_motor.setSpeed(0)
+    
+def testEncoders(HW95_IN1, HW95_IN2, HW95_ENA, HW95_IN3, HW95_IN4, HW95_ENB, ENCODER_LEFT, ENCODER_RIGHT):
+    
+    left_motor = HW95Motor(HW95_IN1, HW95_IN2, HW95_ENA, True)
+    right_motor = HW95Motor(HW95_IN3, HW95_IN4, HW95_ENB, True)
+        
+    left_encoder = WheelEncoder(ENCODER_LEFT, 20, 3)
+    right_encoder = WheelEncoder(ENCODER_RIGHT, 20, 3)
+    
+    #Test left encoder
+    
+    print("Testing left encoder")
+    
+    time.sleep(1)
+    
+    print("Moving left motor 20cm")
+    left_motor.setSpeed(50)
+    
+    left_encoder.reset()
+    while left_encoder.getDistance()<20:
+        time.sleep(0.01)
+        
+    left_motor.setSpeed(0)
+    
+    time.sleep(1)
+    
+    print("Measure the speed of the left motor")
+    
+    time.sleep(1)
+    
+    left_motor.setSpeed(50)
+    
+    end_time = time.time() + 1.5
+    while time.time() < end_time:
+        print(left_encoder.getSpeed())
+        time.sleep(0.1)
+        
+    left_motor.setSpeed(0)
+
+    #Test right encoder
+    
+    print("Testing right encoder")
+    
+    time.sleep(1)
+    
+    print("Moving right motor 20cm")
+    right_motor.setSpeed(50)
+    
+    right_encoder.reset()
+    while right_encoder.getDistance()<20:
+        time.sleep(0.01)
+        
+    right_motor.setSpeed(0)
+    
+    time.sleep(1)
+    
+    print("Measure the speed of the right motor")
+    
+    time.sleep(1)
+    
+    right_motor.setSpeed(50)
+    
+    end_time = time.time() + 1.5
+    while time.time() < end_time:
+        print(right_encoder.getSpeed())
+        time.sleep(0.1)
+        
+    right_motor.setSpeed(0)
+    
+    time.sleep(1)
+    
+    
+def testSmartMotors(HW95_IN1, HW95_IN2, HW95_ENA, HW95_IN3, HW95_IN4, HW95_ENB, ENCODER_LEFT, ENCODER_RIGHT):
+    
+    left_motor = SmartMotor(HW95_IN1, HW95_IN2, HW95_ENA, ENCODER_LEFT, 20, 3, True)
+    right_motor = SmartMotor(HW95_IN3, HW95_IN4, HW95_ENB, ENCODER_RIGHT, 20, 3, True)
+    
+    print("Testing SmartMotor")
+    
+    time.sleep(1)
+    
+    print("Move forward in a straight line by giving the motors equal speeds")
+    
+    left_motor.setSpeed(15)
+    right_motor.setSpeed(15)
+    
+    end_time = time.time() + 4
+    while time.time() < end_time:
+        left_motor.update()
+        right_motor.update()
+        time.sleep(0.01)
+    
+    left_motor.setSpeed(0)
+    right_motor.setSpeed(0)
+    
+    time.sleep(1)
+    
+    print("Rotate on the spot by giving the motors opposite speeds")
+    
+    left_motor.setSpeed(15)
+    right_motor.setSpeed(-15)
+    
+    end_time = time.time() + 4
+    while time.time() < end_time:
+        left_motor.update()
+        right_motor.update()
+        time.sleep(0.01)
+    
+    left_motor.setSpeed(0)
+    right_motor.setSpeed(0)
+    
+    time.sleep(1)
+    
+if __name__ == "__main__":
+    
+    #Left motor
+    HW95_IN1 = 11
+    HW95_IN2 = 13
+    HW95_ENA = 15
+    #Right motor
+    HW95_IN3 = 22
+    HW95_IN4 = 24
+    HW95_ENB = 26
+    
+    ENCODER_LEFT = 7
+    ENCODER_RIGHT = 8
+    
+    testMotors(HW95_IN1, HW95_IN2, HW95_ENA, HW95_IN3, HW95_IN4, HW95_ENB)
+    testEncoders(HW95_IN1, HW95_IN2, HW95_ENA, HW95_IN3, HW95_IN4, HW95_ENB, ENCODER_LEFT, ENCODER_RIGHT)
+    testSmartMotors(HW95_IN1, HW95_IN2, HW95_ENA, HW95_IN3, HW95_IN4, HW95_ENB, ENCODER_LEFT, ENCODER_RIGHT)
+    
+    print("Finished")
+    GPIO.cleanup()
+    

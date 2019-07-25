@@ -57,8 +57,8 @@ if __name__ == "__main__":
     servo1.setAngle(90)
     time.sleep(1)
 
-    print("Angle: 0")
-    servo1.setAngle(0)
+    print("Angle: 180")
+    servo1.setAngle(180)
     time.sleep(1)
     
     servo1.setAngle(90)    
