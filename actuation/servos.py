@@ -18,7 +18,7 @@ class Servo:
         self.min_angle = min_angle
         self.max_angle = max_angle
         
-        self.frequency = 35
+        self.frequency = 10
         
         GPIO.setup(self.PIN, GPIO.OUT)
         self.servo_pwm = GPIO.PWM(self.PIN, self.frequency)
@@ -37,8 +37,10 @@ class Servo:
         self.servo_pwm.ChangeDutyCycle(duty_cycle)
         
 
-if __name__ == "__main__":
+def testServos():
     
+    GPIO.setmode(GPIO.BOARD)
+
     SERVO_1 = 10
     SERVO_2 = 12
     

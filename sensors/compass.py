@@ -139,9 +139,7 @@ class QMC5883L:
         return self.bus.read_i2c_block_data(QMC5883L_Address, address, length)
         
     
-#Run the module directly to print out the heading and check everything works
-
-if __name__ == "__main__":
+def testCompass():
     
     compass = QMC5883L()
 

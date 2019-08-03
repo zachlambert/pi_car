@@ -22,10 +22,10 @@ class OptoInterrupter:
         return GPIO.input(self.PIN)
     
     
-if __name__ == "__main__":
+def testOptoInterrupter():
     
-    OPTO = 18
-    
+    GPIO.setmode(GPIO.BOARD)
+
     left = OptoInterrupter(16)
     right = OptoInterrupter(18)
     
