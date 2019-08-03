@@ -44,8 +44,8 @@ class SmartMotor:
             self.direction = -1
             
         self.target_speed = abs(speed)
-        self.pid_controller.setOutput(100)
-        self.motor.setSpeed(100*self.direction)
+        self.pid_controller.setOutput(40)
+        self.motor.setSpeed(40*self.direction)
         
         
         

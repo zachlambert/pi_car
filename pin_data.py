@@ -26,7 +26,15 @@ class ServoPins:
     
     def __init__(self, PWM):
         self.PWM = PWM
-        
+    
+class CarPins:
+    
+    def __init__(self, left_motor_pins, right_motor_pins, left_encoder_pins, right_encoder_pins):
+        self.left_motor_pins = left_motor_pins
+        self.right_motor_pins = right_motor_pins
+        self.left_encoder_pins = left_encoder_pins
+        self.right_encoder_pins = right_encoder_pins
+    
 def getPins():
     
     pins = {
@@ -37,7 +45,9 @@ def getPins():
         "pan servo": ServoPins(10),
         "tilt servo": ServoPins(12),
         "left opto-interrupter": OptoInterrupterPins(16),
-        "right opto-interrupter": OptoInterrupterPins(18)
+        "right opto-interrupter": OptoInterrupterPins(18),
     }
+    
+    pins["car"] = CarPins(pins["left motor"], pins["right motor"], pins["left encoder"], pins["right encoder"])    
     
     return pins

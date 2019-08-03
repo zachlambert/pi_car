@@ -3,7 +3,7 @@ import time
 
 from pin_data import getPins
 
-from actuation.smart_motors import SmartMotor
+from mechanisms.car import Car
 
 print("Setup")
 
@@ -15,24 +15,33 @@ GPIO.setmode(GPIO.BOARD)
 
 #Motors
 
-left_motor = SmartMotor(pins["left motor"], pins["left encoder"], 20, 3, True)
-right_motor = SmartMotor(pins["right motor"], pins["right encoder"], 20, 3, True)
+car = Car(pins["car"])
 
 print("Starting main loop")
 
-left_motor.setSpeed(15)
-right_motor.setSpeed(15)
+car.setVelocities(15, 0)
 
-end_time = time.time() + 3
+end_time = time.time() + 2
 while time.time()<end_time:
-    left_motor.update()
-    right_motor.update()
+    car.update()
     time.sleep(0.01)
 
+car.setVelocities(0, -2)
+
+end_time = time.time() + 2
+while time.time()<end_time:
+    car.update()
+    time.sleep(0.01)
+    
+car.setVelocities(-20, 1)
+
+end_time = time.time() + 2
+while time.time()<end_time:
+    car.update()
+    time.sleep(0.01)
     
 print("Ending program")
 
-left_motor.setSpeed(0)
-right_motor.setSpeed(0)
+car.setVelocities(0, 0)
 
 GPIO.cleanup()
