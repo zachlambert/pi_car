@@ -1,5 +1,6 @@
 
-from actuation.motors import HW95Motor, WheelEncoder
+from actuation.motors import HW95Motor
+from sensors.encoders import WheelEncoder
 from control.pid_controller import PIDController
 
 import RPi.GPIO as GPIO

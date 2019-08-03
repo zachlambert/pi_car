@@ -1,7 +1,8 @@
 
-from actuation.motors import testMotors, testEncoders
+from actuation.motors import testMotors
 from actuation.smart_motors import testSmartMotors
 from actuation.servos import testServos
+from sensors.encoders import testEncoders
 from sensors.compass import testCompass
 from sensors.opto_interrupter import testOptoInterrupter
 

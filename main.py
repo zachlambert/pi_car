@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 
-from actuation.smart_motor import SmartMotor
+from actuation.smart_motors import SmartMotor
 
 print("Setup")
 
