@@ -6,12 +6,14 @@ from actuation.motors import HW95Motor
 
 import RPi.GPIO as GPIO
 
+from pin_data import getPins
+
 GPIO.setmode(GPIO.BOARD)
 
 class WheelEncoder:
     
-    def __init__(self, PIN, num_slots, wheel_radius):
-        self.PIN = PIN
+    def __init__(self, pins, num_slots, wheel_radius):
+        self.pins = pins
         self.num_changes = num_slots*2
         self.wheel_radius = wheel_radius
         self.pulse_count = 0
@@ -22,10 +24,10 @@ class WheelEncoder:
         self.change_list = []
         self.measure_window= 0.1
         
-        GPIO.setup(self.PIN, GPIO.IN)
+        GPIO.setup(self.pins.OUT, GPIO.IN)
         
-        GPIO.remove_event_detect(self.PIN)
-        GPIO.add_event_detect(self.PIN, GPIO.BOTH, self.callback)
+        GPIO.remove_event_detect(self.pins.OUT)
+        GPIO.add_event_detect(self.pins.OUT, GPIO.BOTH, self.callback)
         
     def callback(self, channel):
         self.pulse_count += 1
@@ -66,23 +68,13 @@ def testEncoders():
     
     GPIO.setmode(GPIO.BOARD)
 
-    #Left motor
-    HW95_IN1 = 11
-    HW95_IN2 = 13
-    HW95_ENA = 15
-    #Right motor
-    HW95_IN3 = 22
-    HW95_IN4 = 24
-    HW95_ENB = 26
+    pins = getPins()
     
-    ENCODER_LEFT = 7
-    ENCODER_RIGHT = 8
-    
-    left_motor = HW95Motor(HW95_IN1, HW95_IN2, HW95_ENA, True)
-    right_motor = HW95Motor(HW95_IN3, HW95_IN4, HW95_ENB, True)
+    left_motor = HW95Motor(pins["left motor"], True)
+    right_motor = HW95Motor(pins["right motor"], True)
         
-    left_encoder = WheelEncoder(ENCODER_LEFT, 20, 3)
-    right_encoder = WheelEncoder(ENCODER_RIGHT, 20, 3)
+    left_encoder = WheelEncoder(pins["left encoder"], 20, 3)
+    right_encoder = WheelEncoder(pins["right encoder"], 20, 3)
     
     #Test left encoder
     

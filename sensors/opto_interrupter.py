@@ -8,26 +8,29 @@ module, for line following.
 
 import RPi.GPIO as GPIO
 import time
+from pin_data import getPins
 
 GPIO.setmode(GPIO.BOARD)
 
 class OptoInterrupter:
     
-    def __init__(self, PIN):
-        self.PIN = PIN
+    def __init__(self, pins):
+        self.pins = pins
         
-        GPIO.setup(self.PIN, GPIO.IN)
+        GPIO.setup(self.pins.OUT, GPIO.IN)
         
     def getValue(self):
-        return GPIO.input(self.PIN)
+        return GPIO.input(self.pins.OUT)
     
     
 def testOptoInterrupter():
     
     GPIO.setmode(GPIO.BOARD)
-
-    left = OptoInterrupter(16)
-    right = OptoInterrupter(18)
+    
+    pins = getPins()
+    
+    left = OptoInterrupter(pins["left opto-interrupter"])
+    right = OptoInterrupter(pins["right opto-interrupter"])
     
     print("Reading left opto-interrupter")
     

@@ -7,21 +7,22 @@ Purpose: To provide a Servo class for controlling servos.
 
 import RPi.GPIO as GPIO
 import time
+from pin_data import getPins
 
 GPIO.setmode(GPIO.BOARD)
 
 class Servo:
     
-    def __init__(self, PIN, start_angle=90, min_angle=0, max_angle=180):
-        self.PIN = PIN
+    def __init__(self, pins, start_angle=90, min_angle=0, max_angle=180):
+        self.pins = pins
         self.angle = start_angle
         self.min_angle = min_angle
         self.max_angle = max_angle
         
         self.frequency = 10
         
-        GPIO.setup(self.PIN, GPIO.OUT)
-        self.servo_pwm = GPIO.PWM(self.PIN, self.frequency)
+        GPIO.setup(self.pins.PWM, GPIO.OUT)
+        self.servo_pwm = GPIO.PWM(self.pins.PWM, self.frequency)
         self.servo_pwm.start(self.angleToDutyCycle(self.angle))
         
     def angleToDutyCycle(self, angle):
@@ -39,13 +40,12 @@ class Servo:
 
 def testServos():
     
+    pins = getPins()
+    
     GPIO.setmode(GPIO.BOARD)
 
-    SERVO_1 = 10
-    SERVO_2 = 12
-    
-    servo1 = Servo(SERVO_1)
-    servo2 = Servo(SERVO_2)
+    servo1 = Servo(pins["pan servo"])
+    servo2 = Servo(pins["tilt servo"])
     
     print("Testing servo 1")
     

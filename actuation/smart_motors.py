@@ -5,12 +5,13 @@ from control.pid_controller import PIDController
 
 import RPi.GPIO as GPIO
 import time
-    
+from pin_data import getPins
+
 class SmartMotor:
     
-    def __init__(self, MOTOR_IN1, MOTOR_IN2, MOTOR_EN, ENCODER_PIN, num_slots, wheel_radius, flip_dir=False):
-        self.motor = HW95Motor(MOTOR_IN1, MOTOR_IN2, MOTOR_EN, flip_dir)
-        self.encoder = WheelEncoder(ENCODER_PIN, num_slots, wheel_radius)
+    def __init__(self, motor_pins, encoder_pins, num_slots, wheel_radius, flip_dir=False):
+        self.motor = HW95Motor(motor_pins, flip_dir)
+        self.encoder = WheelEncoder(encoder_pins, num_slots, wheel_radius)
         
         self.pid_controller = PIDController(0.16, 0.005, 0.03)
         
@@ -52,20 +53,10 @@ def testSmartMotors():
         
     GPIO.setmode(GPIO.BOARD)
 
-    #Left motor
-    HW95_IN1 = 11
-    HW95_IN2 = 13
-    HW95_ENA = 15
-    #Right motor
-    HW95_IN3 = 22
-    HW95_IN4 = 24
-    HW95_ENB = 26
+    pins = getPins()
     
-    ENCODER_LEFT = 7
-    ENCODER_RIGHT = 8
-    
-    left_motor = SmartMotor(HW95_IN1, HW95_IN2, HW95_ENA, ENCODER_LEFT, 20, 3, True)
-    right_motor = SmartMotor(HW95_IN3, HW95_IN4, HW95_ENB, ENCODER_RIGHT, 20, 3, True)
+    left_motor = SmartMotor(pins["left motor"], pins["left encoder"], 20, 3, True)
+    right_motor = SmartMotor(pins["right motor"], pins["right encoder"], 20, 3, True)
     
     print("Testing SmartMotor")
     

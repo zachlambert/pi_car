@@ -7,45 +7,41 @@ motor driver, reading encoders and coupling these together.
 """
 
 import time
-
+from pin_data import getPins
 import RPi.GPIO as GPIO
 
 GPIO.setmode(GPIO.BOARD)
 
 class HW95Motor:
     
-    def __init__(self, IN1, IN2, EN, flip_dir=False):
-        if not flip_dir:
-            self.IN1 = IN1
-            self.IN2 = IN2
-        else:
-            self.IN1 = IN2
-            self.IN2 = IN1
-            
-        self.EN = EN
+    def __init__(self, pins, flip_dir=False):
+        self.pins = pins
         
-        GPIO.setup(self.IN1, GPIO.OUT)
-        GPIO.setup(self.IN2, GPIO.OUT)
-        GPIO.setup(self.EN, GPIO.OUT)
+        if flip_dir:
+            pins.flipDirection()
         
-        GPIO.output(self.IN1, False)
-        GPIO.output(self.IN2, False)
+        GPIO.setup(self.pins.IN1, GPIO.OUT)
+        GPIO.setup(self.pins.IN2, GPIO.OUT)
+        GPIO.setup(self.pins.EN, GPIO.OUT)
         
-        self.en_pwm = GPIO.PWM(self.EN, 100) #100 Hz
+        GPIO.output(self.pins.IN1, False)
+        GPIO.output(self.pins.IN2, False)
+        
+        self.en_pwm = GPIO.PWM(self.pins.EN, 100) #100 Hz
         self.en_pwm.start(0) #Default to 0 duty cycle
         
     def setSpeed(self, speed_percentage):
         self.en_pwm.ChangeDutyCycle(0)
         
         if(speed_percentage>0):
-            GPIO.output(self.IN1, True)
-            GPIO.output(self.IN2, False)
+            GPIO.output(self.pins.IN1, True)
+            GPIO.output(self.pins.IN2, False)
         elif(speed_percentage<0):
-            GPIO.output(self.IN1, False)
-            GPIO.output(self.IN2, True)
+            GPIO.output(self.pins.IN1, False)
+            GPIO.output(self.pins.IN2, True)
         else:
-            GPIO.output(self.IN1, False)
-            GPIO.output(self.IN2, False)
+            GPIO.output(self.pins.IN1, False)
+            GPIO.output(self.pins.IN2, False)
             return
         
         magnitude = abs(speed_percentage)
@@ -59,19 +55,12 @@ class HW95Motor:
 
 def testMotors():
     
+    pins = getPins()
+    
     GPIO.setmode(GPIO.BOARD)
 
-    #Left motor
-    HW95_IN1 = 11
-    HW95_IN2 = 13
-    HW95_ENA = 15
-    #Right motor
-    HW95_IN3 = 22
-    HW95_IN4 = 24
-    HW95_ENB = 26
-    
-    left_motor = HW95Motor(HW95_IN1, HW95_IN2, HW95_ENA, True)
-    right_motor = HW95Motor(HW95_IN3, HW95_IN4, HW95_ENB, True)
+    left_motor = HW95Motor(pins["left motor"], True)
+    right_motor = HW95Motor(pins["right motor"], True)
 
     #Test left motor
     
