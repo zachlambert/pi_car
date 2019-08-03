@@ -11,42 +11,26 @@ class SmartMotor:
         self.motor = HW95Motor(MOTOR_IN1, MOTOR_IN2, MOTOR_EN, flip_dir)
         self.encoder = WheelEncoder(ENCODER_PIN, num_slots, wheel_radius)
         
+        self.pid_controller = PIDController(0.16, 0.005, 0.03)
+        
         self.direction = 0
-        
-        self.measured_speed = 0
-        self.prev_time = time.time()
-        
         self.target_speed = 0
-        self.error = 0
-        self.motor_input = 0
-        
-        self.kp = 0.16
-        self.ki = 0.005
-        self.kd = 0.03
-        
+
         self.setSpeed(0)
         
     def update(self):
 
-        current_time = time.time()
-        elapsed_time = current_time - self.prev_time
-        self.prev_time = current_time
+        measured_speed = self.encoder.getSpeed()
         
-        self.measured_speed = self.encoder.getSpeed()
+        motor_input = self.pid_controller.update(self.target_speed, measured_speed)
         
-        new_error = self.target_speed - self.measured_speed
-        self.motor_input += self.kp * new_error
-        self.motor_input += self.ki * ((new_error - self.error)*elapsed_time)
-        self.motor_input += self.kd * ((new_error - self.error)/elapsed_time)
-        self.error = new_error
+        if motor_input > 100:
+            motor_input = 100
         
-        if self.motor_input > 100:
-            self.motor_input = 100
+        if motor_input < 0:
+            motor_input = 0
         
-        if self.motor_input < 0:
-            self.motor_input = 0
-        
-        self.motor.setSpeed(self.motor_input*self.direction)
+        self.motor.setSpeed(motor_input*self.direction)
 
         
     def setSpeed(self, speed):
@@ -58,8 +42,8 @@ class SmartMotor:
             self.direction = -1
             
         self.target_speed = abs(speed)
-        self.motor_input = 100
-        self.motor.setSpeed(self.motor_input*self.direction)
+        self.pid_controller.setOutput(100)
+        self.motor.setSpeed(100*self.direction)
         
         
         

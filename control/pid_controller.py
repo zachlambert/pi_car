@@ -31,6 +31,8 @@ class PIDController:
         self.prev_error = 0
         self.error_integral = 0
         
+        self.output=0
+        
     def update(self, target, new_input):
         
         current_time = time.time()
@@ -43,12 +45,13 @@ class PIDController:
         
         derivative = (new_error - self.prev_error) / elapsed_time
         
-        output = self.kp*new_error
-        output += self.ki*self.error_integral 
-        output += self.kd*derivative
+        self.output += self.kp*new_error
+        self.output += self.ki*self.error_integral 
+        self.output += self.kd*derivative
                  
         self.prev_error = new_error
                  
-        return output
+        return self.output
         
-    
+    def setOutput(self, output):
+        self.output = output
