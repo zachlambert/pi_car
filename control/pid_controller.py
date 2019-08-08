@@ -1,7 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-pid_controller.py
-
-Purpose: Provides PIDController class for implementing PID control.
+This module provides the PIDController class for implementing PID control.
 
 The PID controller will take one input and produce an output.
 This will be done by calling an update function, which takes the current input,
@@ -20,38 +19,33 @@ Output = kp*error + ki*integral + kd*derivative
 
 import time
 
+
 class PIDController:
     
     def __init__(self, kp, ki, kd):
         self.kp = kp
         self.ki = ki
-        self.kd = kd
-        
+        self.kd = kd        
         self.prev_time = time.time()
         self.prev_error = 0
-        self.error_integral = 0
-        
+        self.error_integral = 0        
         self.output=0
         
     def update(self, target, new_input):
-        
         current_time = time.time()
         elapsed_time = current_time - self.prev_time
         self.prev_time = current_time
         
         new_error = target-new_input
-        
-        self.error_integral += self.prev_error * elapsed_time
-        
-        derivative = (new_error - self.prev_error) / elapsed_time
+        self.error_integral += self.prev_error*elapsed_time
+        derivative = (new_error-self.prev_error) / elapsed_time
         
         self.output += self.kp*new_error
         self.output += self.ki*self.error_integral 
-        self.output += self.kd*derivative
-                 
+        self.output += self.kd*derivative                 
         self.prev_error = new_error
-                 
+        
         return self.output
         
-    def setOutput(self, output):
+    def set_output(self, output):
         self.output = output
