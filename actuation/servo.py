@@ -6,7 +6,7 @@ Provides a servo class for setting up and controlling servos.
 
 import time
 
-import RPi.GPIO as GPIO
+import pigpio
 
 from pin_data import get_pins
 
@@ -18,16 +18,14 @@ class Servo:
         self._angle = start_angle
         self._MIN_ANGLE = MIN_ANGLE
         self._MAX_ANGLE = MAX_ANGLE    
-        self._FREQUENCY = 50
-        
-        GPIO.setup(self._pins.PWM, GPIO.OUT)
-        self._servo_pwm = GPIO.PWM(self._pins.PWM, self._FREQUENCY) 
-        self._servo_pwm.start(0)
+        self._pigpio_pi = pigpio.pi()
         self._update_duty_cycle()
         
     def _update_duty_cycle(self):
-        duty_cycle = (self._FREQUENCY/100) * (self._angle/10.0 + 2.5)
-        self._servo_pwm.ChangeDutyCycle(duty_cycle)
+        #500 = 0 deg, 2500 = 180 deg
+        duty_cycle = 500 + 2000*(self._angle/180)
+        self._pigpio_pi.set_servo_pulsewidth(self._pins.PWM,
+                                             duty_cycle)
     
     def set_angle(self, angle):
         if angle<self._MIN_ANGLE:
@@ -40,7 +38,6 @@ class Servo:
 
 def test_servo():
     pins = get_pins()
-    GPIO.setmode(GPIO.BOARD)
 
     servo1 = Servo(pins["pan servo"])
     servo2 = Servo(pins["tilt servo"])
@@ -72,4 +69,3 @@ def test_servo():
     servo2.set_angle(90)
     
     print("Finished")
-    GPIO.cleanup()

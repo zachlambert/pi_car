@@ -45,8 +45,8 @@ def get_pins():
         "right motor": _MotorPins(22, 24, 26),
         "left encoder": _EncoderPins(7),
         "right encoder": _EncoderPins(8),
-        "pan servo": _ServoPins(10),
-        "tilt servo": _ServoPins(12),
+        "pan servo": _ServoPins(15), #BCM
+        "tilt servo": _ServoPins(18), #BCM
         "left opto-interrupter": _OptoInterrupterPins(16),
         "right opto-interrupter": _OptoInterrupterPins(18),
     }
