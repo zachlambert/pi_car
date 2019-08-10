@@ -22,6 +22,7 @@ class Servo:
         
         GPIO.setup(self._pins.PWM, GPIO.OUT)
         self._servo_pwm = GPIO.PWM(self._pins.PWM, self._FREQUENCY) 
+        self._servo_pwm.start(0)
         self._update_duty_cycle()
         
     def _update_duty_cycle(self):

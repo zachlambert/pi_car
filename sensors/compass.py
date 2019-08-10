@@ -128,7 +128,7 @@ class Compass:
     
 def test_compass():
     compass = Compass()
-    end_time = time.time() + 8
+    end_time = time.time() + 16
     while time.time() < end_time:    
         print(compass.get_heading())    
         time.sleep(0.25)
