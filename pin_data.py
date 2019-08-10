@@ -1,5 +1,5 @@
 
-class MotorPins:
+class _MotorPins:
     
     def __init__(self, IN1, IN2, EN):
         self.IN1 = IN1
@@ -12,25 +12,25 @@ class MotorPins:
         self.IN2 = prev_IN1
         
         
-class EncoderPins:
+class _EncoderPins:
     
     def __init__(self, OUT):
         self.OUT = OUT
         
         
-class OptoInterrupterPins:
+class _OptoInterrupterPins:
     
     def __init__(self, OUT):
         self.OUT = OUT
         
         
-class ServoPins:
+class _ServoPins:
     
     def __init__(self, PWM):
         self.PWM = PWM
     
     
-class CarPins:
+class _CarPins:
     
     def __init__(self, left_motor_pins, right_motor_pins, left_encoder_pins, right_encoder_pins):
         self.left_motor_pins = left_motor_pins
@@ -41,15 +41,15 @@ class CarPins:
     
 def get_pins():
     pins = {
-        "left motor": MotorPins(11, 13,15),
-        "right motor": MotorPins(22, 24, 26),
-        "left encoder": EncoderPins(7),
-        "right encoder": EncoderPins(8),
-        "pan servo": ServoPins(10),
-        "tilt servo": ServoPins(12),
-        "left opto-interrupter": OptoInterrupterPins(16),
-        "right opto-interrupter": OptoInterrupterPins(18),
+        "left motor": _MotorPins(11, 13,15),
+        "right motor": _MotorPins(22, 24, 26),
+        "left encoder": _EncoderPins(7),
+        "right encoder": _EncoderPins(8),
+        "pan servo": _ServoPins(10),
+        "tilt servo": _ServoPins(12),
+        "left opto-interrupter": _OptoInterrupterPins(16),
+        "right opto-interrupter": _OptoInterrupterPins(18),
     }
-    pins["car"] = CarPins(pins["left motor"], pins["right motor"], pins["left encoder"], pins["right encoder"])    
+    pins["car"] = _CarPins(pins["left motor"], pins["right motor"], pins["left encoder"], pins["right encoder"])    
     
     return pins

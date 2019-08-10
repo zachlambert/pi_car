@@ -12,14 +12,14 @@ import smbus
 
 
 #I2C Address
-I2C_ADDRESS = 0x0D
+_I2C_ADDRESS = 0x0D
 
 #Register Addresses
-CONTROL_REGISTER_1 = 0x09
-CONTROL_REGISTER_2 = 0x0A
-SET_RESET_PERIOD_REGISTER = 0x0B
-DATA_REGISTER_BEGIN = 0x00
-TEMP_REGISTER_BEGIN = 0x07
+_CONTROL_REGISTER_1 = 0x09
+_CONTROL_REGISTER_2 = 0x0A
+_SET_RESET_PERIOD_REGISTER = 0x0B
+_DATA_REGISTER_BEGIN = 0x00
+_TEMP_REGISTER_BEGIN = 0x07
 
 
 #Class for storing configuration options
@@ -35,7 +35,7 @@ class CompassConfig:
         
 
 #Class for storing the magnetic field strength in each axis
-class MagnetometerData:
+class _MagnetometerData:
     
     def __init__(self):
         self.x_axis = 0
@@ -44,7 +44,7 @@ class MagnetometerData:
 
 
 #Helper function
-def signed_int(value):
+def _signed_int(value):
     max_unsigned = 65536
     if value > (max_unsigned/2 - 1):
         return value-max_unsigned
@@ -53,7 +53,7 @@ def signed_int(value):
         
     
 #Gives the deafult config options
-def get_default_config():
+def _get_default_config():
     OSR = 0b00
     RNG = 0b00
     ODR = 0b00
@@ -77,18 +77,18 @@ def get_default_config():
 class Compass:
     
     #Can load with a specific config, or if left blank, loads the default config
-    def __init__(self, config=get_default_config()):
-        self.bus = smbus.SMBus(1) #I2C channel = 1
-        self.write(CONTROL_REGISTER_1, [config.OSR_RNG_ODR_MODE])
-        self.write(CONTROL_REGISTER_2, [config.CR2_INT_ENABLE])
-        self.write(SET_RESET_PERIOD_REGISTER, [config.SET_RESET_PERIOD])
+    def __init__(self, config=_get_default_config()):
+        self._bus = smbus.SMBus(1) #I2C channel = 1
+        self._write(_CONTROL_REGISTER_1, [config.OSR_RNG_ODR_MODE])
+        self._write(_CONTROL_REGISTER_2, [config.CR2_INT_ENABLE])
+        self._write(_SET_RESET_PERIOD_REGISTER, [config.SET_RESET_PERIOD])
         if config.OSR_RNG_ODR_MODE & 0b00010000 == 0b00010000:
-            self.m_scale = 8 / 32768
+            self._scale = 8 / 32768
         else:
-            self.m_scale = 2 / 32768
+            self._scale = 2 / 32768
     
     def get_heading(self):
-        data = self.read_data()
+        data = self._read_data()
         heading = math.atan2(data.y_axis, data.x_axis)
         declination_angle = math.radians(-0.22) #Found here: http://www.magnetic-declination.com/
         heading += declination_angle
@@ -98,8 +98,8 @@ class Compass:
             heading -= 2*math.pi            
         return math.degrees(heading)
     
-    def read_data(self):
-        raw_data = self.read(DATA_REGISTER_BEGIN, 6)
+    def _read_data(self):
+        raw_data = self._read(_DATA_REGISTER_BEGIN, 6)
         x_lsb = raw_data[0]
         x_msb = raw_data[1]
         y_lsb = raw_data[2]
@@ -109,21 +109,21 @@ class Compass:
 
         #Python converts bits to unsigned integers, so the "signed_int"
         #function is used to convert these to signed integers
-        data = MagnetometerData()     
-        x_raw = signed_int(x_msb << 8 | x_lsb)
-        y_raw = signed_int(y_msb << 8 | y_lsb)
-        z_raw = signed_int(z_msb << 8 | z_lsb)   
-        data.x_axis = x_raw*self.m_scale
-        data.y_axis = y_raw*self.m_scale
-        data.z_axis = z_raw*self.m_scale
+        data = _MagnetometerData()     
+        x_raw = _signed_int(x_msb << 8 | x_lsb)
+        y_raw = _signed_int(y_msb << 8 | y_lsb)
+        z_raw = _signed_int(z_msb << 8 | z_lsb)   
+        data.x_axis = x_raw*self._scale
+        data.y_axis = y_raw*self._scale
+        data.z_axis = z_raw*self._scale
         
         return data
             
-    def write(self, address, data):
-        self.bus.write_i2c_block_data(I2C_ADDRESS, address, data)
+    def _write(self, address, data):
+        self._bus.write_i2c_block_data(_I2C_ADDRESS, address, data)
     
-    def read(self, address, length):
-        return self.bus.read_i2c_block_data(I2C_ADDRESS, address, length)
+    def _read(self, address, length):
+        return self._bus.read_i2c_block_data(_I2C_ADDRESS, address, length)
         
     
 def test_compass():

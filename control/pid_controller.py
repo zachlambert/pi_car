@@ -23,29 +23,29 @@ import time
 class PIDController:
     
     def __init__(self, kp, ki, kd):
-        self.kp = kp
-        self.ki = ki
-        self.kd = kd        
-        self.prev_time = time.time()
-        self.prev_error = 0
-        self.error_integral = 0        
-        self.output=0
+        self._kp = kp
+        self._ki = ki
+        self._kd = kd        
+        self._prev_time = time.time()
+        self._prev_error = 0
+        self._error_integral = 0        
+        self._output=0
         
     def update(self, target, new_input):
         current_time = time.time()
-        elapsed_time = current_time - self.prev_time
-        self.prev_time = current_time
+        elapsed_time = current_time - self._prev_time
+        self._prev_time = current_time
         
         new_error = target-new_input
-        self.error_integral += self.prev_error*elapsed_time
-        derivative = (new_error-self.prev_error) / elapsed_time
+        self._error_integral += self._prev_error*elapsed_time
+        derivative = (new_error-self._prev_error) / elapsed_time
         
-        self.output += self.kp*new_error
-        self.output += self.ki*self.error_integral 
-        self.output += self.kd*derivative                 
-        self.prev_error = new_error
+        self._output += self._kp*new_error
+        self._output += self._ki*self._error_integral 
+        self._output += self._kd*derivative                 
+        self._prev_error = new_error
         
-        return self.output
+        return self._output
         
     def set_output(self, output):
-        self.output = output
+        self._output = output

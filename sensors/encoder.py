@@ -15,53 +15,53 @@ from pin_data import get_pins
 
 class WheelEncoder:
     
-    def __init__(self, pins, num_slots, wheel_radius):
-        self.pins = pins
-        self.num_changes = num_slots*2
-        self.wheel_radius = wheel_radius
-        self.pulse_count = 0
-        self.distance_step = self.wheel_radius * ((2*math.pi) / self.num_changes)
-        self.speed = 0
-        self.prev_time = time.time()
-        self.change_list = []
-        self.measure_window= 0.1
+    def __init__(self, pins, NUM_SLOTS, WHEEL_RADIUS):
+        self._pins = pins
+        self._NUM_CHANGES = NUM_SLOTS*2
+        self._WHEEL_RADIUS = WHEEL_RADIUS
+        self._pulse_count = 0
+        self._DISTANCE_STEP = self._WHEEL_RADIUS * ((2*math.pi) / self._NUM_CHANGES)
+        self._speed = 0
+        self._prev_time = time.time()
+        self._change_list = []
+        self._MEASURE_WINDOW = 0.1
         
-        GPIO.setup(self.pins.OUT, GPIO.IN)
-        GPIO.remove_event_detect(self.pins.OUT)
-        GPIO.add_event_detect(self.pins.OUT, GPIO.BOTH, self.callback)
+        GPIO.setup(self._pins.OUT, GPIO.IN)
+        GPIO.remove_event_detect(self._pins.OUT) #If an event detect is present already
+        GPIO.add_event_detect(self._pins.OUT, GPIO.BOTH, self._callback)
         
-    def callback(self, channel):
-        self.pulse_count += 1
+    def _callback(self, channel):
+        self._pulse_count += 1
         current_time = time.time()
-        elapsed_time = current_time - self.prev_time
-        self.prev_time = current_time
+        elapsed_time = current_time - self._prev_time
+        self._prev_time = current_time
         
         i = 0
-        while i < len(self.change_list):
-            self.change_list[i] += elapsed_time
-            if self.change_list[i] > self.measure_window:
-                self.change_list.pop(i)
+        while i < len(self._change_list):
+            self._change_list[i] += elapsed_time
+            if self._change_list[i] > self._MEASURE_WINDOW:
+                self._change_list.pop(i)
             else:
                 i+=1
-        self.change_list.append(0)
+        self._change_list.append(0)
         
     def get_speed(self):
         current_time = time.time()
-        elapsed_time = current_time - self.prev_time
-        time_limit = self.measure_window - elapsed_time
+        elapsed_time = current_time - self._prev_time
+        time_limit = self._MEASURE_WINDOW - elapsed_time
         
         change_count = 0
-        for change in self.change_list:
+        for change in self._change_list:
             if change <= time_limit:
                 change_count+=1
                 
-        return (change_count*self.distance_step) / self.measure_window
+        return (change_count*self._DISTANCE_STEP) / self._MEASURE_WINDOW
     
     def reset(self):
-        self.pulse_count = 0
+        self._pulse_count = 0
 
     def get_distance(self): #in cm
-        return self.wheel_radius * (self.pulse_count/self.num_changes) * (2*math.pi)     
+        return self._pulse_count * self._DISTANCE_STEP  
     
         
 def test_encoder():

@@ -15,38 +15,38 @@ from pin_data import get_pins
 class HW95Motor:
     
     def __init__(self, pins, flip_dir=False):
-        self.pins = pins
+        self._pins = pins
         if flip_dir:
-            pins.flip_direction()
+            self._pins.flip_direction()
             
-        GPIO.setup(self.pins.IN1, GPIO.OUT)
-        GPIO.setup(self.pins.IN2, GPIO.OUT)
-        GPIO.setup(self.pins.EN, GPIO.OUT)
-        self.en_pwm = GPIO.PWM(self.pins.EN, 100) #100 Hz
+        GPIO.setup(self._pins.IN1, GPIO.OUT)
+        GPIO.setup(self._pins.IN2, GPIO.OUT)
+        GPIO.setup(self._pins.EN, GPIO.OUT)
+        self._en_pwm = GPIO.PWM(self._pins.EN, 100) #100 Hz
         
-        GPIO.output(self.pins.IN1, False)
-        GPIO.output(self.pins.IN2, False)
-        self.en_pwm.start(0) #Default to 0 duty cycle
+        GPIO.output(self._pins.IN1, False)
+        GPIO.output(self._pins.IN2, False)
+        self._en_pwm.start(0) #Default to 0 duty cycle
         
     def set_speed(self, speed_percentage):
-        self.en_pwm.ChangeDutyCycle(0)
+        self._en_pwm.ChangeDutyCycle(0)
         
         if speed_percentage>0:
-            GPIO.output(self.pins.IN1, True)
-            GPIO.output(self.pins.IN2, False)
+            GPIO.output(self._pins.IN1, True)
+            GPIO.output(self._pins.IN2, False)
         elif speed_percentage<0:
-            GPIO.output(self.pins.IN1, False)
-            GPIO.output(self.pins.IN2, True)
+            GPIO.output(self._pins.IN1, False)
+            GPIO.output(self._pins.IN2, True)
         else:
-            GPIO.output(self.pins.IN1, False)
-            GPIO.output(self.pins.IN2, False)
+            GPIO.output(self._pins.IN1, False)
+            GPIO.output(self._pins.IN2, False)
             return
         
         magnitude = abs(speed_percentage)
         if magnitude>100:
             magnitude = 100
             
-        self.en_pwm.ChangeDutyCycle(magnitude)
+        self._en_pwm.ChangeDutyCycle(magnitude)
         
 
 def test_motor():

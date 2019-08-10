@@ -16,6 +16,7 @@ Todo:
 """
 
 import math
+import time
 
 import RPi.GPIO as GPIO
 
@@ -26,41 +27,60 @@ from pin_data import get_pins
 class Car:
     
     def __init__(self, pins):
-        self.left_motor = SmartMotor(pins.left_motor_pins, pins.left_encoder_pins, 20, 3, True)
-        self.right_motor = SmartMotor(pins.right_motor_pins, pins.right_encoder_pins, 20, 3, True)
-        self.velocity = 0
-        self.angular_velocity = 0 #clockwise
-        self.wheel_distance = 6.2 #62cm from centre to either wheel
+        self._left_motor = SmartMotor(pins.left_motor_pins, pins.left_encoder_pins, 20, 3, True)
+        self._right_motor = SmartMotor(pins.right_motor_pins, pins.right_encoder_pins, 20, 3, True)
+        self._velocity = 0
+        self._angular_velocity = 0 #clockwise
+        self._WHEEL_DISTANCE = 6.2 #62cm from centre to either wheel
         
     def update(self):
-        self.left_motor.update()
-        self.right_motor.update()
+        self._left_motor.update()
+        self._right_motor.update()
         
-    def update_motor_speeds(self):
-        left_velocity = self.velocity + self.wheel_distance*self.angular_velocity
-        right_velocity = self.velocity - self.wheel_distance*self.angular_velocity
-        self.left_motor.set_speed(left_velocity)
-        self.right_motor.set_speed(right_velocity)
+    def _update_motor_speeds(self):
+        left_velocity = self._velocity + self._WHEEL_DISTANCE*self._angular_velocity
+        right_velocity = self._velocity - self._WHEEL_DISTANCE*self._angular_velocity
+        self._left_motor.set_speed(left_velocity)
+        self._right_motor.set_speed(right_velocity)
         
     def set_velocities(self, velocity, angular_velocity):
-        self.velocity = velocity
-        self.angular_velocity = angular_velocity
-        self.update_motor_speeds()
+        self._velocity = velocity
+        self._angular_velocity = angular_velocity
+        self._update_motor_speeds()
         
     def set_velocity(self, velocity):
-        self.velocity = velocity
-        self.update_motor_speeds()
+        self._velocity = velocity
+        self._update_motor_speeds()
         
     def set_angular_velocity(self, angular_velocity_degrees):
-        self.angular_velocity = math.radians(angular_velocity_degrees)
-        self.update_motor_speeds()
+        self._angular_velocity = math.radians(angular_velocity_degrees)
+        self._update_motor_speeds()
         
         
 def test_car():
     GPIO.setmode(GPIO.BOARD)
     pins = get_pins()
+    car = Car(pins["car"])
     
-    print("Test code for car is not implemented yet.")
+    print("Moving straight forward")
+    car.set_velocities(15, 0)
+    end_time = time.time() + 2
+    while time.time()<end_time:
+        car.update()
+        time.sleep(0.01)
+    print("Rotating on the spot")
+    car.set_velocities(0, -2)
+    end_time = time.time() + 2
+    while time.time()<end_time:
+        car.update()
+        time.sleep(0.01)
+    print("Reversing and turning left with turning radius 20cm")
+    car.set_velocities(-20, 1)
+    end_time = time.time() + 2
+    while time.time()<end_time:
+        car.update()
+        time.sleep(0.01)
+    car.set_velocities(0, 0)
     
     print("Finished")
     GPIO.cleanup()

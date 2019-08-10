@@ -13,28 +13,28 @@ from pin_data import get_pins
 
 class Servo:
     
-    def __init__(self, pins, start_angle=90, min_angle=0, max_angle=180):
-        self.pins = pins
-        self.angle = start_angle
-        self.min_angle = min_angle
-        self.max_angle = max_angle    
-        self.frequency = 10
+    def __init__(self, pins, start_angle=90, MIN_ANGLE=0, MAX_ANGLE=180):
+        self._pins = pins
+        self._angle = start_angle
+        self._MIN_ANGLE = MIN_ANGLE
+        self._MAX_ANGLE = MAX_ANGLE    
+        self._FREQUENCY = 50
         
-        GPIO.setup(self.pins.PWM, GPIO.OUT)
-        self.servo_pwm = GPIO.PWM(self.pins.PWM, self.frequency)
-        self.servo_pwm.start(self.angle_to_duty_cycle(self.angle))
+        GPIO.setup(self._pins.PWM, GPIO.OUT)
+        self._servo_pwm = GPIO.PWM(self._pins.PWM, self._FREQUENCY) 
+        self._update_duty_cycle()
         
-    def angle_to_duty_cycle(self, angle):
-        return (self.frequency/100) * (angle/10.0 + 2.5)
+    def _update_duty_cycle(self):
+        duty_cycle = (self._FREQUENCY/100) * (self._angle/10.0 + 2.5)
+        self._servo_pwm.ChangeDutyCycle(duty_cycle)
     
     def set_angle(self, angle):
-        if angle<self.min_angle:
-            angle = self.min_angle
-        if angle>self.max_angle:
-            angle = self.max_angle
-            
-        duty_cycle = self.angle_to_duty_cycle(angle)
-        self.servo_pwm.ChangeDutyCycle(duty_cycle)
+        if angle<self._MIN_ANGLE:
+            angle = self._MIN_ANGLE
+        if angle>self._MAX_ANGLE:
+            angle = self._MAX_ANGLE
+        self._angle = angle
+        self._update_duty_cycle()
         
 
 def test_servo():

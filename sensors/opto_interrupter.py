@@ -15,11 +15,11 @@ from pin_data import get_pins
 class OptoInterrupter:
     
     def __init__(self, pins):
-        self.pins = pins        
-        GPIO.setup(self.pins.OUT, GPIO.IN)
+        self._pins = pins        
+        GPIO.setup(self._pins.OUT, GPIO.IN)
         
     def get_value(self):
-        return GPIO.input(self.pins.OUT)
+        return GPIO.input(self._pins.OUT)
     
     
 def test_opto_interrupter():    

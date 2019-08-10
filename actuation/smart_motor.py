@@ -18,32 +18,32 @@ from sensors.encoder import WheelEncoder
 class SmartMotor:
     
     def __init__(self, motor_pins, encoder_pins, num_slots, wheel_radius, flip_dir=False):
-        self.motor = HW95Motor(motor_pins, flip_dir)
-        self.encoder = WheelEncoder(encoder_pins, num_slots, wheel_radius)        
-        self.pid_controller = PIDController(0.16, 0.005, 0.03)        
-        self.direction = 0
-        self.target_speed = 0
+        self._motor = HW95Motor(motor_pins, flip_dir)
+        self._encoder = WheelEncoder(encoder_pins, num_slots, wheel_radius)        
+        self._pid_controller = PIDController(0.16, 0.005, 0.03)        
+        self._direction = 0
+        self._target_speed = 0
         self.set_speed(0)
         
     def update(self):
-        measured_speed = self.encoder.get_speed()
-        motor_input = self.pid_controller.update(self.target_speed, measured_speed)        
+        measured_speed = self._encoder.get_speed()
+        motor_input = self._pid_controller.update(self._target_speed, measured_speed)        
         if motor_input > 100:
             motor_input = 100        
         if motor_input < 0:
             motor_input = 0        
-        self.motor.set_speed(motor_input*self.direction)
+        self._motor.set_speed(motor_input*self._direction)
         
     def set_speed(self, speed):
         if speed==0:
-            self.direction = 0
+            self._direction = 0
         elif speed>0:
-            self.direction = 1
+            self._direction = 1
         else:
-            self.direction = -1            
-        self.target_speed = abs(speed)
-        self.pid_controller.set_output(40)
-        self.motor.set_speed(40*self.direction)
+            self._direction = -1            
+        self._target_speed = abs(speed)
+        self._pid_controller.set_output(40)
+        self._motor.set_speed(40*self._direction)
         
         
 def test_smart_motor():
