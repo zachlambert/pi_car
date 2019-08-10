@@ -10,32 +10,18 @@ import time
 
 import RPi.GPIO as GPIO
 
-from mechanisms.car import Car
+from mechanisms.line_follower import LineFollower
 from pin_data import get_pins
 
 
-print("Setup")
 pins = get_pins()
 GPIO.setmode(GPIO.BOARD)
-car = Car(pins["car"])
+robot = LineFollower(pins["line follower"])
 
-print("Starting main loop")
-car.set_velocities(15, 0)
-end_time = time.time() + 2
+end_time = time.time() + 1000
 while time.time()<end_time:
-    car.update()
-    time.sleep(0.01)
-car.set_velocities(0, -2)
-end_time = time.time() + 2
-while time.time()<end_time:
-    car.update()
-    time.sleep(0.01)
-car.set_velocities(-20, 1)
-end_time = time.time() + 2
-while time.time()<end_time:
-    car.update()
+    robot.update()
     time.sleep(0.01)
     
-print("Ending program")
-car.set_velocities(0, 0)
+robot._car.set_velocities(0, 0)
 GPIO.cleanup()

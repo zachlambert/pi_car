@@ -10,9 +10,6 @@ Wheel Distance = Distance from car centre to either wheel (cm)
 Left motor speed = Velocity + Wheel Distance * Angular Velocity
 Right motor speed = Velocity - Wheel Distance ( Angular Velocity
 
-Todo:
-    Complete test function                                               
-
 """
 
 import math
@@ -29,32 +26,19 @@ class Car:
     def __init__(self, pins):
         self._left_motor = SmartMotor(pins.left_motor_pins, pins.left_encoder_pins, 20, 3, True)
         self._right_motor = SmartMotor(pins.right_motor_pins, pins.right_encoder_pins, 20, 3, True)
-        self._velocity = 0
-        self._angular_velocity = 0 #clockwise
+        self.velocity = 0
+        self.angular_velocity = 0 #clockwise
         self._WHEEL_DISTANCE = 6.2 #62cm from centre to either wheel
         
     def update(self):
         self._left_motor.update()
         self._right_motor.update()
         
-    def _update_motor_speeds(self):
-        left_velocity = self._velocity + self._WHEEL_DISTANCE*self._angular_velocity
-        right_velocity = self._velocity - self._WHEEL_DISTANCE*self._angular_velocity
+    def set_velocities(self, velocity, angular_velocity):
+        left_velocity = velocity + self._WHEEL_DISTANCE*angular_velocity
+        right_velocity = velocity - self._WHEEL_DISTANCE*angular_velocity
         self._left_motor.set_speed(left_velocity)
         self._right_motor.set_speed(right_velocity)
-        
-    def set_velocities(self, velocity, angular_velocity):
-        self._velocity = velocity
-        self._angular_velocity = angular_velocity
-        self._update_motor_speeds()
-        
-    def set_velocity(self, velocity):
-        self._velocity = velocity
-        self._update_motor_speeds()
-        
-    def set_angular_velocity(self, angular_velocity_degrees):
-        self._angular_velocity = math.radians(angular_velocity_degrees)
-        self._update_motor_speeds()
         
         
 def test_car():
