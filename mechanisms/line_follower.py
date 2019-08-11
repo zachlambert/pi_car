@@ -20,12 +20,12 @@ class LineFollower:
         self._right_opto_interrupter = OptoInterrupter(
             pins.right_opto_interrupter_pins)
         
-        self._MAX_VELOCITY = 5
-        self._MIN_VELOCITY = -1
-        self._VELOCITY_DECAY_RATE = 15 #When turning, velocity decreases by 2cm/s per second
-        self._MAX_ANGULAR_VELOCITY = 45
+        self._MAX_VELOCITY = 10
+        self._MIN_VELOCITY = 0
+        self._VELOCITY_DECAY_RATE = 30 #When turning, velocity decreases by 2cm/s per second
+        self._MAX_ANGULAR_VELOCITY = 180
         self._MIN_ANGULAR_VELOCITY = 0
-        self._ANGULAR_VELOCITY_GROW_RATE = 45
+        self._ANGULAR_VELOCITY_GROW_RATE = 540
         self._velocity = self._MAX_VELOCITY    
         self._angular_velocity = 0
         self._turning_timer = 0
@@ -39,7 +39,7 @@ class LineFollower:
         
         new_direction = 0
         if self._at_left_edge() and self._at_right_edge():
-            self._car.set_velocities(-0.5, self._direction*30)
+            self._car.set_velocities(-5, self._direction*90)
             self._car.update()
             return
         if self._at_left_edge():
@@ -76,7 +76,7 @@ class LineFollower:
         self._angular_velocity *= self._direction
         self._car.set_velocities(self._velocity, self._angular_velocity)
         self._car.update()
-                      
+                              
     def _at_left_edge(self):
         return self._right_opto_interrupter.get_value() == 1
     

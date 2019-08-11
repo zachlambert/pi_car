@@ -12,6 +12,7 @@ Right motor speed = Velocity - Wheel Distance ( Angular Velocity
 
 """
 
+import math
 import time
 
 import RPi.GPIO as GPIO
@@ -33,7 +34,8 @@ class Car:
         self._left_motor.update()
         self._right_motor.update()
         
-    def set_velocities(self, velocity, angular_velocity):
+    def set_velocities(self, velocity, angular_velocity_degrees):
+        angular_velocity = math.radians(angular_velocity_degrees)
         left_velocity = velocity + self._WHEEL_DISTANCE*angular_velocity
         right_velocity = velocity - self._WHEEL_DISTANCE*angular_velocity
         self._left_motor.set_speed(left_velocity)
@@ -51,14 +53,14 @@ def test_car():
     while time.time()<end_time:
         car.update()
         time.sleep(0.01)
-    print("Rotating on the spot")
-    car.set_velocities(0, -2)
+    print("Rotating on the spot at 90 degrees per second")
+    car.set_velocities(0, -90)
     end_time = time.time() + 2
     while time.time()<end_time:
         car.update()
         time.sleep(0.01)
     print("Reversing and turning left with turning radius 20cm")
-    car.set_velocities(-20, 1)
+    car.set_velocities(-20, math.degrees(1))
     end_time = time.time() + 2
     while time.time()<end_time:
         car.update()
