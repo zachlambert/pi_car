@@ -51,7 +51,7 @@ class _LineFollowerPins:
     
 def get_pins():
     pins = {
-        "left motor": _MotorPins(11, 13,15),
+        "left motor": _MotorPins(11, 13, 22),
         "right motor": _MotorPins(22, 24, 26),
         "left encoder": _EncoderPins(7),
         "right encoder": _EncoderPins(8),

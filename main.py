@@ -18,7 +18,7 @@ pins = get_pins()
 GPIO.setmode(GPIO.BOARD)
 robot = LineFollower(pins["line follower"])
 
-end_time = time.time() + 1000
+end_time = time.time() + 20
 while time.time()<end_time:
     robot.update()
     time.sleep(0.01)

@@ -12,7 +12,6 @@ Right motor speed = Velocity - Wheel Distance ( Angular Velocity
 
 """
 
-import math
 import time
 
 import RPi.GPIO as GPIO

@@ -37,13 +37,13 @@ class SmartMotor:
     def set_speed(self, speed):
         if speed==0:
             self._direction = 0
+            self._target_speed = 0
+            self._motor.set_speed(0)
         elif speed>0:
             self._direction = 1
         else:
             self._direction = -1            
         self._target_speed = abs(speed)
-        self._pid_controller.set_output(40)
-        self._motor.set_speed(40*self._direction)
         
         
 def test_smart_motor():
