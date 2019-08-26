@@ -19,6 +19,7 @@ import RPi.GPIO as GPIO
 
 from actuation.smart_motor import SmartMotor
 from pin_data import get_pins
+from utils.updater import Updater
 
 
 class Car:
@@ -33,8 +34,8 @@ class Car:
         self.distance = 0
         
     def update(self, dt):
-        self._left_motor.update()
-        self._right_motor.update()
+        self._left_motor.update(dt)
+        self._right_motor.update(dt)
         measured_velocity = (self._left_motor.get_velocity()
                              + self._right_motor.get_velocity()) / 2     
         self.distance += dt * measured_velocity
@@ -55,25 +56,24 @@ def test_car():
     GPIO.setmode(GPIO.BOARD)
     pins = get_pins()
     car = Car(pins["car"])
+    updater = Updater(0.01)
+    updater.add(car.update)
     
     print("Moving straight forward")
     car.set_velocities(15, 0)
-    end_time = time.time() + 2
-    while time.time()<end_time:
-        car.update()
-        time.sleep(0.01)
+    updater.reset_timer()
+    while updater.timer<2:
+        updater.update()
     print("Rotating on the spot at 90 degrees per second")
     car.set_velocities(0, -90)
-    end_time = time.time() + 2
-    while time.time()<end_time:
-        car.update()
-        time.sleep(0.01)
+    updater.reset_timer()
+    while updater.timer<2:
+        updater.update()
     print("Reversing and turning left with turning radius 20cm")
     car.set_velocities(-20, math.degrees(1))
-    end_time = time.time() + 2
-    while time.time()<end_time:
-        car.update()
-        time.sleep(0.01)
+    updater.reset_timer()
+    while updater.timer<2:
+        updater.update()
     car.set_velocities(0, 0)
     
     print("Finished")

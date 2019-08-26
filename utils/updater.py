@@ -12,11 +12,14 @@ class Updater:
         self.timer = 0
         
     def reset_timer(self):
-        self.total_time = 0
+        self.timer = 0
         
     def add(self, function, period=0):
         self.functions.append([function, 0, period])
-
+    
+    def remove(self, index):
+        self.functions.pop(index)
+        
     def update(self):
         current_time = time.time()
         dt = current_time - self.prev_time

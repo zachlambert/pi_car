@@ -176,7 +176,7 @@ class Compass:
 def test_compass():
     compass = Compass()
     compass.calibrate()
-    end_time = time.time() + 1000
+    end_time = time.time() + 10
     while time.time() < end_time:    
         print(compass.get_heading())
         time.sleep(0.25)

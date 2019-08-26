@@ -17,8 +17,6 @@ Output = kp*error + ki*integral + kd*derivative
 
 """
 
-import time
-
 
 class PIDController:
     
@@ -26,19 +24,14 @@ class PIDController:
         self._kp = kp
         self._ki = ki
         self._kd = kd        
-        self._prev_time = time.time()
         self._prev_error = 0
         self._error_integral = 0        
         self._output=0
         
-    def update(self, target, new_input):
-        current_time = time.time()
-        elapsed_time = current_time - self._prev_time
-        self._prev_time = current_time
-        
+    def update(self, target, new_input, dt):        
         new_error = target-new_input
-        self._error_integral += self._prev_error*elapsed_time
-        derivative = (new_error-self._prev_error) / elapsed_time
+        self._error_integral += self._prev_error*dt
+        derivative = (new_error-self._prev_error) / dt
         
         self._output += self._kp*new_error
         self._output += self._ki*self._error_integral 

@@ -111,5 +111,5 @@ def test_mpu():
     print_yaw = lambda dt: print("Heading: {}".format(mpu.yaw))
     updater.add(print_yaw, 0.5)
     
-    while updater.timer <= 60:
+    while updater.timer <= 10:
         updater.update()    

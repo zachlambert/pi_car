@@ -32,11 +32,7 @@ class LineFollower:
         self._direction = 0 #1 = clockwise, -1 = anticlockwise, 0 = straight
         self._prev_time = time.time()
         
-    def update(self):
-        current_time = time.time()
-        elapsed_time = current_time - self._prev_time
-        self._prev_time = current_time
-        
+    def update(self, dt):
         new_direction = 0
         if self._at_left_edge() and self._at_right_edge():
             self._car.set_velocities(-5, self._direction*90)
@@ -49,9 +45,9 @@ class LineFollower:
             
         if new_direction == self._direction:
             if new_direction == 1:
-                self._turning_timer += elapsed_time
+                self._turning_timer += dt
             elif new_direction == -1:
-                self._turning_timer -= elapsed_time
+                self._turning_timer -= dt
         else:
             self._turning_timer = 0
             self._direction = new_direction
@@ -75,7 +71,7 @@ class LineFollower:
         
         self._angular_velocity *= self._direction
         self._car.set_velocities(self._velocity, self._angular_velocity)
-        self._car.update()
+        self._car.update(dt)
                               
     def _at_left_edge(self):
         return self._right_opto_interrupter.get_value() == 1
