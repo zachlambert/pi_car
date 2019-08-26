@@ -23,7 +23,7 @@ class SmartMotor:
         self._pid_controller = PIDController(0.16, 0.005, 0.03)        
         self._direction = 0
         self._target_speed = 0
-        self.set_speed(0)
+        self.set_velocity(0)
         
     def update(self):
         measured_speed = self._encoder.get_speed()
@@ -34,7 +34,7 @@ class SmartMotor:
             motor_input = 0        
         self._motor.set_speed(motor_input*self._direction)
         
-    def set_speed(self, speed):
+    def set_velocity(self, speed):
         if speed==0:
             self._direction = 0
             self._motor.set_speed(0)
@@ -45,6 +45,8 @@ class SmartMotor:
             self._direction = -1            
         self._target_speed = abs(speed)
 
+    def get_velocity(self):
+        return self._encoder.get_speed() * self._direction
         
 def test_smart_motor():
     GPIO.setmode(GPIO.BOARD)
@@ -55,27 +57,27 @@ def test_smart_motor():
     print("Testing SmartMotor")    
     time.sleep(1)    
     print("Move forward in a straight line by giving the motors equal speeds")    
-    left_motor.set_speed(15)
-    right_motor.set_speed(15)    
+    left_motor.set_velocity(15)
+    right_motor.set_velocity(15)    
     end_time = time.time() + 2
     while time.time() < end_time:
         left_motor.update()
         right_motor.update()
         time.sleep(0.01)    
-    left_motor.set_speed(0)
-    right_motor.set_speed(0)    
+    left_motor.set_velocity(0)
+    right_motor.set_velocity(0)    
     time.sleep(1)
     
     print("Rotate on the spot by giving the motors opposite speeds")    
-    left_motor.set_speed(15)
-    right_motor.set_speed(-15)    
+    left_motor.set_velocity(15)
+    right_motor.set_velocity(-15)    
     end_time = time.time() + 2
     while time.time() < end_time:
         left_motor.update()
         right_motor.update()
         time.sleep(0.01)    
-    left_motor.set_speed(0)
-    right_motor.set_speed(0)    
+    left_motor.set_velocity(0)
+    right_motor.set_velocity(0)    
     time.sleep(1)
     
     print("Varying the speed of left motor")
@@ -85,7 +87,7 @@ def test_smart_motor():
     end_time = start_time + 3
     while time.time() < end_time:
         elapsed_time = time.time() - start_time
-        left_motor.set_speed(
+        left_motor.set_velocity(
             start_speed + (end_speed-start_speed)*(elapsed_time/3))
         left_motor.update()
         time.sleep(0.01)
@@ -93,10 +95,11 @@ def test_smart_motor():
     end_time = start_time + 3
     while time.time() < end_time:
         elapsed_time = time.time() - start_time
-        left_motor.set_speed(
+        left_motor.set_velocity(
             end_speed - (end_speed-start_speed)*(elapsed_time/3))
         left_motor.update()
         time.sleep(0.01)
-        
+    left_motor.set_velocity(0)
+    
     print("Finished")
     GPIO.cleanup()

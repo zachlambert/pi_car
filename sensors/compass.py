@@ -8,6 +8,8 @@ module.
 import math
 import time
 
+import matplotlib.pyplot as plt
+import numpy as np
 import smbus
 
 
@@ -21,6 +23,9 @@ _SET_RESET_PERIOD_REGISTER = 0x0B
 _DATA_REGISTER_BEGIN = 0x00
 _TEMP_REGISTER_BEGIN = 0x07
 
+#Compass Calibration Values
+_MAGNETOMETER_X_OFFSET = 0.00244
+_MAGNETOMETER_Y_OFFSET = -0.0843
 
 #Class for storing configuration options
 class CompassConfig:
@@ -89,15 +94,57 @@ class Compass:
     
     def get_heading(self):
         data = self._read_data()
-        heading = math.atan2(data.y_axis, data.x_axis)
-        declination_angle = math.radians(-0.22) #Found here: http://www.magnetic-declination.com/
+        heading = math.degrees(math.atan2(
+            (data.y_axis - _MAGNETOMETER_Y_OFFSET),
+            (data.x_axis - _MAGNETOMETER_X_OFFSET)))
+        declination_angle = -0.22 #Found here: http://www.magnetic-declination.com/
         heading += declination_angle
         if heading < 0:
-            heading += 2*math.pi
-        if heading > 2*math.pi:
-            heading -= 2*math.pi            
-        return math.degrees(heading)
+            heading += 360
+        if heading > 360:
+            heading -= 360            
+        return heading
     
+    def calibrate(self, update_func=None, TIME_STEP=0.05):
+        finished = False
+        plots = []
+        while not finished:
+            SAMPLE_TIME = 6
+            NUM_SAMPLES = int(SAMPLE_TIME / TIME_STEP)
+            data = None
+            points = np.zeros((NUM_SAMPLES,2))
+            for i in range(points.shape[0]):
+                data = self._read_data()
+                points[i] = (data.x_axis, data.y_axis)
+                if update_func != None:
+                    update_func()
+                time.sleep(TIME_STEP)
+            min_x = np.min(points[:, 0])
+            max_x = np.max(points[:, 0])
+            min_y = np.min(points[:, 1])
+            max_y = np.max(points[:, 1])
+            x_centre = (min_x + max_x) / 2
+            y_centre = (min_y + max_y) / 2
+            print("Calibration factors:")
+            print("X:{}, Y:{}".format(x_centre, y_centre))
+            
+            plots.append(points)
+            
+            plt.figure()
+            ax = plt.gca()
+            for stored_points in plots:
+                ax.plot(stored_points[:, 0], stored_points[:, 1])
+            ax.spines['left'].set_position('zero')
+            ax.spines['right'].set_color('none')
+            ax.spines['bottom'].set_position('zero')
+            ax.spines['top'].set_color('none')
+            plt.savefig('calibration.png')
+            
+            print("Finished. Type anything to repeat.")
+            user_input = input(">")
+            if user_input=="":
+                finished = True
+                
     def _read_data(self):
         raw_data = self._read(_DATA_REGISTER_BEGIN, 6)
         x_lsb = raw_data[0]
@@ -109,10 +156,10 @@ class Compass:
 
         #Python converts bits to unsigned integers, so the "signed_int"
         #function is used to convert these to signed integers
-        data = _MagnetometerData()     
         x_raw = _signed_int(x_msb << 8 | x_lsb)
         y_raw = _signed_int(y_msb << 8 | y_lsb)
         z_raw = _signed_int(z_msb << 8 | z_lsb)   
+        data = _MagnetometerData()     
         data.x_axis = x_raw*self._scale
         data.y_axis = y_raw*self._scale
         data.z_axis = z_raw*self._scale
@@ -128,7 +175,9 @@ class Compass:
     
 def test_compass():
     compass = Compass()
-    end_time = time.time() + 16
+    compass.calibrate()
+    end_time = time.time() + 1000
     while time.time() < end_time:    
-        print(compass.get_heading())    
+        print(compass.get_heading())
         time.sleep(0.25)
+        

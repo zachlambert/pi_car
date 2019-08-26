@@ -30,16 +30,25 @@ class Car:
         self.angular_velocity = 0 #clockwise
         self._WHEEL_DISTANCE = 6.2 #62cm from centre to either wheel
         
-    def update(self):
+        self.distance = 0
+        
+    def update(self, dt):
         self._left_motor.update()
         self._right_motor.update()
+        measured_velocity = (self._left_motor.get_velocity()
+                             + self._right_motor.get_velocity()) / 2     
+        self.distance += dt * measured_velocity
+        
+    def reset_distance(self):
+        self.distance = 0
         
     def set_velocities(self, velocity, angular_velocity_degrees):
-        angular_velocity = math.radians(angular_velocity_degrees)
-        left_velocity = velocity + self._WHEEL_DISTANCE*angular_velocity
-        right_velocity = velocity - self._WHEEL_DISTANCE*angular_velocity
-        self._left_motor.set_speed(left_velocity)
-        self._right_motor.set_speed(right_velocity)
+        self.velocity = velocity
+        self.angular_velocity = math.radians(angular_velocity_degrees)
+        left_velocity = self.velocity + self._WHEEL_DISTANCE*self.angular_velocity
+        right_velocity = self.velocity - self._WHEEL_DISTANCE*self.angular_velocity
+        self._left_motor.set_velocity(left_velocity)
+        self._right_motor.set_velocity(right_velocity)
         
         
 def test_car():
