@@ -10,7 +10,7 @@ import time
 import RPi.GPIO as GPIO
 
 from actuation.motor import HW95Motor 
-from pin_data import get_pins
+from utils.pin_data import get_pins
 
 
 class WheelEncoder:

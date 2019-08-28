@@ -13,12 +13,11 @@ Right motor speed = Velocity - Wheel Distance ( Angular Velocity
 """
 
 import math
-import time
 
 import RPi.GPIO as GPIO
 
 from actuation.smart_motor import SmartMotor
-from pin_data import get_pins
+from utils.pin_data import get_pins
 from utils.updater import Updater
 
 

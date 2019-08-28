@@ -17,26 +17,17 @@ from sensors.opto_interrupter import test_opto_interrupter
 
 test_strings = ["motor", "smart motor", "servo", "car", "encoder", "compass", "mpu", "opto-interrupter"]
 test_functions = [test_motor, test_smart_motor, test_servo, test_car, test_encoder, test_compass, test_mpu, test_opto_interrupter]
-running = True
 
-while running:
-    print("Enter name of component to test or type 'exit'")    
-    user_input = input(">").strip()    
-    found = False    
-    i = 0
-    while i < len(test_strings):
-        if test_strings[i] == user_input:
-            found=True
-            break
-        i+=1
-        
-    if found:
-        print("Running test program for ", test_strings[i])
-        print("")
-        test_functions[i]()
-        print("")
-    elif user_input == "exit":
-        running = False
-        print("Exiting")
-    else: 
-        print("Invalid input")
+class Program:
+    
+    def __init__(self):
+        pass
+    
+    def update(self, instruction):
+        for i in range(len(test_strings)):
+            if test_strings[i]==instruction:
+                test_functions[i]()
+                break
+            
+    def stop(self):
+        pass

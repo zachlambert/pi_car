@@ -9,7 +9,7 @@ import time
 
 import RPi.GPIO as GPIO
 
-from pin_data import get_pins
+from utils.pin_data import get_pins
 
 
 class HW95Motor:

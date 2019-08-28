@@ -8,7 +8,7 @@ import time
 
 import pigpio
 
-from pin_data import get_pins
+from utils.pin_data import get_pins
 
 
 class Servo:

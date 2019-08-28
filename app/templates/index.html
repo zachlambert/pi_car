@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Robot Image Server</h1>
+    <img src="{{ url_for('display') }}"><br>
+    <div>
+    {% block manual_link %}
+        <a href="{{ url_for('manual') }}">Manual</a>
+    {% endblock %}
+    {% block line_follower_link %}
+        <a href="{{ url_for('line_follower') }}">Line Follower</a>
+    {% endblock %}
+    {% block test_link %}
+        <a href="{{ url_for('test') }}">Test</a>
+    {% endblock %}
+    </div>
+    
+    {% block program %}
+    {% endblock %}
+{% endblock %}

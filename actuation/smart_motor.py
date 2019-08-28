@@ -11,7 +11,7 @@ import RPi.GPIO as GPIO
 
 from actuation.motor import HW95Motor
 from control.pid_controller import PIDController
-from pin_data import get_pins
+from utils.pin_data import get_pins
 from sensors.encoder import WheelEncoder
 from utils.updater import Updater
 
