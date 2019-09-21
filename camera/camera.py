@@ -4,59 +4,64 @@ import time
 
 from picamera.array import PiRGBArray
 from picamera import PiCamera
-import numpy as np
 import cv2
+
+from camera import app
+from utils.updater import Updater
 
 
 _CAMERA_SIZE = (320, 240)
 _ENCODE_PARAMS = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+server_started = False
 
-def _get_encoded_bytes_for_frame(frame):
+def _encode_frame(frame):
     result, encoded_image = cv2.imencode(".jpg", frame, _ENCODE_PARAMS)
     return encoded_image.tostring()
+
 
 class Camera:
     
     def __init__(self):
-        self._camera = PiCamera()
-        self._camera.resolution = _CAMERA_SIZE
-        self._camera.rotation = 180
-        self._process = None
-        
-    def start_server(self):
-        from camera.app import app
-        self._process = Process(target=app.run, args={ 'debug':True, 'port':5000})
-        time.sleep(0.1) # Esnure the camera has had 0.1 seconds to initialise
-        self._process.start()
+        camera = PiCamera()
+        camera.resolution = _CAMERA_SIZE
+        camera.rotation = 180
     
-    def stop_server(self):
-        if self._process != None:
-            self._process.terminate()
-            self._process = None
-            
-    def frame_generator(self):                
-        for frame in self._camera_stream():
-            encoded_bytes = _get_encoded_bytes_for_frame(frame)
-            yield (b'--frame\r\n' +
-                   b'Content-Type: image/jpeg\r\n\r\n' +
-                   encoded_bytes +
-                   b'\r\n')
-        
-    def _camera_stream(self):
-        image_storage = PiRGBArray(self._camera, size=self._camera.resolution)
-        camera_stream = self._camera.capture_continuous(
-            image_storage, format="bgr", use_video_port=True)
-        
-        for raw_frame in camera_stream:
-            yield raw_frame.array
-            image_storage.truncate(0)
-                                             
+        time.sleep(0.1)
 
-def test_camera():
+        self._image_storage = PiRGBArray(camera, size=camera.resolution)
+        self._camera_stream = camera.capture_continuous(
+            self._image_storage, format="bgr", use_video_port=True)
+    
+    def update(self):
+        raw_frame = next(self._camera_stream)
+        frame = raw_frame.array
+        if server_started:
+            encoded_bytes = _encode_frame(frame)
+            app.put_image(encoded_bytes)
+        self._image_storage.truncate(0)
+        return frame
+
+
+def start_server():
+    global server_started
+    server_process = Process(
+        target=app.app.run, kwargs={ 'host':'0.0.0.0', 'port':5001})
+    server_process.start()
+    server_started = True
+    return server_process
+
+
+def test():
+    server_process = start_server()
     camera = Camera()
-    camera.start_server()
-    user_input = ""
-    while user_input!="stop":
-        print("Type 'stop' to stop the program.")
-        user_input = input(">")
-    camera.stop_server()
+    
+    def update(time):
+        frame = camera.update()
+        print("Received frame of shape ", frame.shape)
+    
+    updater = Updater(0.01)
+    updater.add(update)
+    while updater.timer<120:
+        updater.update()
+
+    server_process.terminate()
