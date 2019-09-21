@@ -104,7 +104,7 @@ class Mpu:
         return self._bus.read_i2c_block_data(_I2C_ADDRESS, address, length)
     
     
-def test_mpu():
+def test():
     mpu = Mpu()
     updater = Updater(0.01)
     updater.add(mpu.update)

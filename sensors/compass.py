@@ -173,7 +173,7 @@ class Compass:
         return self._bus.read_i2c_block_data(_I2C_ADDRESS, address, length)
         
     
-def test_compass():
+def test():
     compass = Compass()
     compass.calibrate()
     end_time = time.time() + 10

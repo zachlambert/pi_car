@@ -13,7 +13,6 @@ Right motor speed = Velocity - Wheel Distance ( Angular Velocity
 """
 
 import math
-import time
 
 import RPi.GPIO as GPIO
 
@@ -52,7 +51,7 @@ class Car:
         self._right_motor.set_velocity(right_velocity)
         
         
-def test_car():
+def test():
     GPIO.setmode(GPIO.BOARD)
     pins = get_pins()
     car = Car(pins["car"])

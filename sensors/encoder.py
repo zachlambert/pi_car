@@ -64,7 +64,7 @@ class WheelEncoder:
         return self._pulse_count * self._DISTANCE_STEP  
     
         
-def test_encoder():
+def test():
     pins = get_pins()
     GPIO.setmode(GPIO.BOARD)
     

@@ -5,6 +5,7 @@ import time
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 import cv2
+import numpy as np
 
 from camera import app
 from utils.updater import Updater
@@ -12,7 +13,6 @@ from utils.updater import Updater
 
 _CAMERA_SIZE = (320, 240)
 _ENCODE_PARAMS = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
-server_started = False
 
 def _encode_frame(frame):
     result, encoded_image = cv2.imencode(".jpg", frame, _ENCODE_PARAMS)
@@ -35,33 +35,44 @@ class Camera:
     def update(self):
         raw_frame = next(self._camera_stream)
         frame = raw_frame.array
-        if server_started:
-            encoded_bytes = _encode_frame(frame)
-            app.put_image(encoded_bytes)
         self._image_storage.truncate(0)
         return frame
 
 
-def start_server():
-    global server_started
-    server_process = Process(
-        target=app.app.run, kwargs={ 'host':'0.0.0.0', 'port':5001})
-    server_process.start()
-    server_started = True
-    return server_process
+class CameraServer:
+    
+    def __init__(self):
+        self._server_process = Process(
+                target=app.app.run, kwargs={ 'host':'0.0.0.0', 'port':5001})
+        self._server_process.start()
+
+    def stop(self):
+        self._server_process.terminate()
+        
+    def put_images(self, *frames):
+        rgb_frames = []
+        for frame in frames:
+            if len(frame.shape)==2:
+                rgb_frames.append(cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR))
+            else:
+                rgb_frames.append(frame)
+                                  
+        combined_frame = np.concatenate(rgb_frames, axis=0)
+        encoded_bytes = _encode_frame(combined_frame)
+        app.put_image(encoded_bytes)
 
 
 def test():
-    server_process = start_server()
+    server = CameraServer()
     camera = Camera()
     
     def update(time):
         frame = camera.update()
-        print("Received frame of shape ", frame.shape)
+        server.put_images(frame)
     
     updater = Updater(0.01)
     updater.add(update)
     while updater.timer<120:
         updater.update()
 
-    server_process.terminate()
+    server.stop()

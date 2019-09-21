@@ -49,7 +49,7 @@ class SmartMotor:
     def get_velocity(self):
         return self._encoder.get_speed() * self._direction
         
-def test_smart_motor():
+def test():
     GPIO.setmode(GPIO.BOARD)
     pins = get_pins()    
     left_motor = SmartMotor(pins["left motor"], pins["left encoder"], 20, 3, True)

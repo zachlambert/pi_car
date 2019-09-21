@@ -22,7 +22,7 @@ class OptoInterrupter:
         return GPIO.input(self._pins.OUT)
     
     
-def test_opto_interrupter():    
+def test():    
     pins = get_pins()
     GPIO.setmode(GPIO.BOARD)    
     left = OptoInterrupter(pins["left opto-interrupter"])

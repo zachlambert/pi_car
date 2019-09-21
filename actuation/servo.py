@@ -36,7 +36,7 @@ class Servo:
         self._update_duty_cycle()
         
 
-def test_servo():
+def test():
     pins = get_pins()
 
     servo1 = Servo(pins["pan servo"])

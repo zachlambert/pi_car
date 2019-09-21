@@ -17,7 +17,8 @@ _test_modules = {
     'compass': 'sensors.compass',
     'mpu': 'sensors.mpu',
     'opto-interrupter': 'sensors.opto_interrupter',
-    'camera': 'camera.camera'
+    'camera': 'camera.camera',
+    'object-tracker': 'camera.object_tracker'
 }
 
 running = True

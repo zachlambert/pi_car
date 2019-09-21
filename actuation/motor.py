@@ -49,7 +49,7 @@ class HW95Motor:
         self._en_pwm.ChangeDutyCycle(magnitude)
         
 
-def test_motor():
+def test():
     pins = get_pins()
     GPIO.setmode(GPIO.BOARD)
     left_motor = HW95Motor(pins["left motor"], True)
