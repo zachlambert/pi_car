@@ -28,13 +28,30 @@ class Servo:
                                              duty_cycle)
     
     def set_angle(self, angle):
+        at_limit = True
         if angle<self._MIN_ANGLE:
             angle = self._MIN_ANGLE
-        if angle>self._MAX_ANGLE:
+        elif angle>self._MAX_ANGLE:
             angle = self._MAX_ANGLE
+        else:
+            at_limit = False
         self._angle = angle
         self._update_duty_cycle()
+        return at_limit
+    
+    
+class VelocityServo(Servo):
+    
+    def __init__(self, pins, start_angle=90, MIN_ANGLE=0, MAX_ANGLE=180):
+        super().__init__(pins, start_angle, MIN_ANGLE, MAX_ANGLE)
+        self.velocity = 0
         
+    def update(self, dt):
+        new_angle = self._angle + dt*self.velocity
+        at_limit = self.set_angle(new_angle)
+        if at_limit:
+            self.velocity = 0
+
 
 def test():
     pins = get_pins()

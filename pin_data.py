@@ -48,6 +48,13 @@ class _LineFollowerPins:
         self.left_opto_interrupter_pins = left_opto_interrupter_pins
         self.right_opto_interrupter_pins = right_opto_interrupter_pins
         
+        
+class _CameraMountPins:
+    
+    def __init__(self, pan_servo_pins, tilt_servo_pins):
+        self.pan_servo_pins = pan_servo_pins
+        self.tilt_servo_pins = tilt_servo_pins
+        
     
 def get_pins():
     pins = {
@@ -66,5 +73,7 @@ def get_pins():
     pins["line follower"] = _LineFollowerPins(
         pins["car"],
         pins["left opto-interrupter"], pins["right opto-interrupter"])
-        
+    pins["camera mount"] = _CameraMountPins(
+        pins["pan servo"], pins["tilt servo"])
+    
     return pins

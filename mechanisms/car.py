@@ -41,6 +41,12 @@ class Car:
         
     def reset_distance(self):
         self.distance = 0
+      
+    def set_velocity(self, velocity):
+        self.set_velocities(velocity, self.angular_velocity)
+        
+    def set_angular_velocity(self, angular_velocity):
+        self.set_velocities(self.velocity, angular_velocity)
         
     def set_velocities(self, velocity, angular_velocity_degrees):
         self.velocity = velocity
