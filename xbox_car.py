@@ -6,6 +6,7 @@ from xbox import xbox
 from mechanisms.car import Car
 from mechanisms.camera_mount import CameraMount
 from camera.camera import Camera, CameraServer
+from camera.object_tracker import ObjectTracker
 from pin_data import get_pins
 from utils.updater import Updater
 
@@ -17,12 +18,15 @@ car = Car(pins["car"])
 camera_mount = CameraMount(pins["camera mount"])
 camera = Camera()
 camera_server = CameraServer()
+tracker = ObjectTracker()
 
 def update_camera(time):
+    camera.update()
     frame = camera.update()
-    camera_server.put_images(frame)
+    masked, pos, radius = tracker.find_object(frame, draw_circle=True)
+    camera_server.put_images(frame, masked)
     
-updater = Updater(0.01)
+updater = Updater(0)
 updater.add(car.update)
 updater.add(camera_mount.update)
 updater.add(update_camera)
@@ -34,9 +38,9 @@ while not joy.Back():
         car.set_velocities(0, 0)
     else:
         if joy.rightTrigger()>0.05:
-            car.set_velocity(joy.rightTrigger()*20)
+            car.set_velocity(joy.rightTrigger()*30)
         elif joy.leftTrigger()>0.05:
-            car.set_velocity(-joy.leftTrigger()*20)
+            car.set_velocity(-joy.leftTrigger()*30)
         else:
             car.set_velocity(0)
             
@@ -58,4 +62,4 @@ while not joy.Back():
             
     updater.update()
 
-camera_server.stop()
+#camera_server.stop()
